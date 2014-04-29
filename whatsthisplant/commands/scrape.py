@@ -49,7 +49,4 @@ def get_args():
 
 def main():
     args = get_args()
-    if args['SOURCE'] is None:
-        list_scrapers()
-    else:
-        run_scraper(args['SOURCE'], args['SEED'], args['--base-url'])
+    run_scraper(args['SOURCE'], args['SEED'], args['--base-url'])
