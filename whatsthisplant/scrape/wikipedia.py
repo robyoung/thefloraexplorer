@@ -48,7 +48,7 @@ def parse_category_members(data):
     return [member['title'] for member in data['query']['categorymembers']]
 
 
-def get_all_categories(base_url, category, categories=None):
+def get_categories(base_url, category, categories=None):
     logger.debug("Category: %s", category)
     if categories is None:
         categories = {category}
@@ -58,23 +58,28 @@ def get_all_categories(base_url, category, categories=None):
     categories |= subcats_to_load
 
     for subcat in subcats_to_load:
-        categories |= get_all_categories(base_url, subcat, categories)
+        categories |= get_categories(base_url, subcat, categories)
 
     return categories
+
+
+def get_all_categories(base_url, categories):
+    with futures.ThreadPoolExecutor(len(categories)) as executor:
+        return reduce(
+            set.union,
+            executor.map(
+                partial(get_categories, base_url),
+                categories))
 
 
 def get_page_names(base_url, category):
     if isinstance(category, basestring):
         category = [category]
+
     with futures.ThreadPoolExecutor(50) as executor:
-        categories = reduce(
-                set.union,
-                executor.map(
-                    partial(get_all_categories, base_url),
-                    category))
         all_page_names = executor.map(
             partial(get_page_names_for_category, base_url),
-            categories)
+            get_all_categories(base_url, category))
 
         return reduce(set.union, all_page_names, set())
 
