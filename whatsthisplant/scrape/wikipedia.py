@@ -81,7 +81,7 @@ def get_page_names(base_url, category):
             partial(get_page_names_for_category, base_url),
             get_all_categories(base_url, category))
 
-        return reduce(set.union, all_page_names, set())
+        return reduce(set.union, all_page_names)
 
 
 def get_page_names_for_category(base_url, category):
@@ -128,11 +128,13 @@ def get_plants(category, base_url):
         category = SEED_CATEGORIES
     if base_url is None:
         base_url = WIKIPEDIA_URL
+
     page_names = get_page_names(base_url, category)
     with futures.ThreadPoolExecutor(50) as executor:
         page_contents = executor.map(
             partial(get_page_content, base_url),
             page_names)
         pages = map(parse_plant_info, page_contents)
+
         return filter(None, pages)
 
