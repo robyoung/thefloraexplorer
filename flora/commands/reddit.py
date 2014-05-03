@@ -44,6 +44,7 @@ def run_bot(index_path, subreddit):
     for comment in client.get_comments(subreddit, limit=200):
         if is_bot(comment):
             logger.info("Skipping bot comment %s", comment.id)
+            continue
         
         match = search.best_match(index, comment.body)
         if match is not None:
