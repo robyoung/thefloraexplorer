@@ -107,7 +107,7 @@ def get_page(base_url, page_name):
 # Find scientific classifications:
 #  ordo, familia, genus and species (binomial species name)
 SCIENTIFIC_CLASSIFICATIONS_PATTERN = re.compile(
-    r"\|\s*(ordo|familia|genus|binomial)\s*=\s*['\[]*([^'\]\n]+)[\]']*")
+    r"\|\s*(ordo|familia|genus|binomial)\s*=\s*([^\n&;{}]+)")
 # Find common names (bolded strings)
 COMMON_NAME_PATTERN = re.compile(r"[^']'''([^']+)'''[^']")
 def parse_plant_info(page):
@@ -127,12 +127,15 @@ def parse_plant_info(page):
     }
     classifications = reversed(SCIENTIFIC_CLASSIFICATIONS_PATTERN.findall(content))
 
-    plant.update((key, value.lower()) for key, value in classifications)
+    def clean_name(name):
+        return re.sub(r"['\[\]]", '', name.lower())
+
+    plant.update((key, clean_name(value)) for key, value in classifications)
 
     if plant['binomial'] is None:
         return None
 
-    if '|' in plant['genus']:
+    if isinstance(plant['genus'], basestring) and '|' in plant['genus']:
         plant['common_genus'], plant['genus'] = plant['genus'].split('|')
 
     plant['common_names'] = [
