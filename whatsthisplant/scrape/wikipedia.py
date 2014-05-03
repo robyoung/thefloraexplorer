@@ -125,7 +125,7 @@ def parse_plant_info(page):
             "wikipedia": page['url']
         }
     }
-    classifications = SCIENTIFIC_CLASSIFICATIONS_PATTERN.findall(content)
+    classifications = reversed(SCIENTIFIC_CLASSIFICATIONS_PATTERN.findall(content))
 
     plant.update((key, value.lower()) for key, value in classifications)
 
