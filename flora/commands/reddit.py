@@ -1,27 +1,25 @@
 """A Reddit bot for linking to plant information
 
 Usage:
-    wtp-reddit [--subreddit=SUBREDDIT] INDEX_PATH
+    flora-reddit [--subreddit=SUBREDDIT] INDEX_PATH
 
 Options:
     --subreddit=SUBREDDIT  The subreddit to run the bot in [default: whatsthisplant].
 """
-from __future__ import print_function
 from datetime import datetime
 import logging
-from pprint import pprint
 import os
 
 import docopt
 import praw
 
-from whatsthisplant import search, utils
+from .. import search, utils
 
 
 logging.basicConfig(
     level=getattr(logging, os.environ.get('LOGLEVEL', 'WARNING')))
 for handler in logging.root.handlers:
-    handler.addFilter(logging.Filter("whatsthisplant"))
+    handler.addFilter(logging.Filter("flora"))
 
 logger = logging.getLogger(__name__)
 

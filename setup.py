@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 import sys
 
 setup(
-    name='whatsthisplant',
+    name='thefloraexplorer',
     version='0.0.1',
-    url='none',
+    url='https://github.com/robyoung/thefloraexplorer',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
@@ -16,8 +16,8 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "wtp-scrape = whatsthisplant.commands.scrape:main",
-            "wtp-reddit = whatsthisplant.commands.reddit:main",
+            "flora-scrape = flora.commands.scrape:main",
+            "flora-reddit = flora.commands.reddit:main",
         ],
     },
     tests_require=['nose'],

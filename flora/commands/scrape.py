@@ -6,8 +6,8 @@ Available sources:
     {{sources}}
 
 Usage:
-    wtp-scrape [--base-url=<base_url>] SOURCE [SEED ...]
-    wtp-scrape (-h | --help)
+    flora-scrape [--base-url=<base_url>] SOURCE [SEED ...]
+    flora-scrape (-h | --help)
 
 Options:
     -h --help               Show this help.
@@ -29,7 +29,7 @@ from .. import scrape
 logging.basicConfig(
     level=getattr(logging, os.environ.get('LOGLEVEL', 'WARNING')))
 for handler in logging.root.handlers:
-    handler.addFilter(logging.Filter("whatsthisplant"))
+    handler.addFilter(logging.Filter("flora"))
 
 
 def get_scrapers():
