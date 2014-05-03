@@ -7,7 +7,7 @@ def test_parse_plant_info_with_common_genus():
 |genus = spruce|picea
 |binomial = picea engelmannii
 """
-    page = {"url": "", "content": content}
+    page = {"name": "spruce", "url": "", "content": content}
     plant = parse_plant_info(page)
 
     eq_(plant['genus'], 'picea')
