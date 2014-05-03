@@ -11,7 +11,7 @@ import futures
 
 __all__ = ['get_plants']
 
-WIKIPEDIA_URL="http://en.wikipedia.org/w/api.php"
+WIKIPEDIA_URL="http://en.wikipedia.org"
 SEED_CATEGORIES=[
     "Category:Trees_by_continent",
     "Category:Trees_by_country",
@@ -36,10 +36,13 @@ def build_page_query(title):
              "titles={}&prop=revisions&rvprop=content"
     return query.format(title)
 
+def build_page_url(base_url, title):
+    return u"{}/wiki/{}".format(base_url, title.replace(' ', '_'))
+
 
 def query_wikipedia(base_url, query):
     """Run a query against the Wikipedia API"""
-    response = requests.get(u"{}?{}".format(base_url, query))
+    response = requests.get(u"{}/w/api.php?{}".format(base_url, query))
     response.raise_for_status()
     return response.json()
 
@@ -90,37 +93,50 @@ def get_page_names_for_category(base_url, category):
     return set(parse_category_members(data))
 
 
-def get_page_content(base_url, page_name):
+def get_page(base_url, page_name):
     logger.debug("Page: %s", page_name)
     data = query_wikipedia(base_url, build_page_query(page_name))
+    page = data['query']['pages'].values()[0]
 
-    return data['query']['pages'].values()[0]['revisions'][0]['*']
+    return {
+        "url": build_page_url(base_url, page_name),
+        "content": page['revisions'][0]['*']
+    }
 
 # Find scientific classifications:
 #  ordo, familia, genus and species (binomial species name)
 SCIENTIFIC_CLASSIFICATIONS_PATTERN = re.compile(
-    r"\|\s*(ordo|familia|genus|binomial)\s*=\s*['\[]*([^'\]]+)[\]']*")
+    r"\|\s*(ordo|familia|genus|binomial)\s*=\s*['\[]*([^'\]\n]+)[\]']*")
 # Find common names (bolded strings)
 COMMON_NAME_PATTERN = re.compile(r"[^']'''([^']+)'''[^']")
-def parse_plant_info(content):
-    page = {
+def parse_plant_info(page):
+    content = page['content']
+
+    plant = {
         "ordo": None,
         "familia": None,
         "genus": None,
+        "common_genus": None,
         "binomial": None,
         "common_names": [],
+        "links": {
+            "wikipedia": page['url']
+        }
     }
     classifications = SCIENTIFIC_CLASSIFICATIONS_PATTERN.findall(content)
 
-    page.update((key, value.lower()) for key, value in classifications)
-    
-    if page['binomial'] is None:
+    plant.update((key, value.lower()) for key, value in classifications)
+
+    if '|' in plant['genus']:
+        plant['common_genus'], plant['genus'] = plant['genus'].split('|')
+
+    if plant['binomial'] is None:
         return None
 
-    page['common_names'] = [
+    plant['common_names'] = [
             n.lower() for n in COMMON_NAME_PATTERN.findall(content)]
 
-    return page
+    return plant
 
 
 def get_plants(category, base_url):
@@ -131,10 +147,10 @@ def get_plants(category, base_url):
 
     page_names = get_page_names(base_url, category)
     with futures.ThreadPoolExecutor(50) as executor:
-        page_contents = executor.map(
-            partial(get_page_content, base_url),
+        pages = executor.map(
+            partial(get_page, base_url),
             page_names)
-        pages = map(parse_plant_info, page_contents)
+        plants = map(parse_plant_info, pages)
 
-        return filter(None, pages)
+        return filter(None, plants)
 

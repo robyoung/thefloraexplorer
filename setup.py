@@ -18,6 +18,8 @@ setup(
             "wtp-scrape = whatsthisplant.commands.scrape:main",
         ],
     },
+    tests_require=['nose'],
+    test_suite='nose.collector',
 )
 
 
