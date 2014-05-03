@@ -1,2 +1,3 @@
 *.pyc
 /whatsthisplant.egg-info
+/*.egg
