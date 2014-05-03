@@ -99,6 +99,7 @@ def get_page(base_url, page_name):
     page = data['query']['pages'].values()[0]
 
     return {
+        "name": page_name,
         "url": build_page_url(base_url, page_name),
         "content": page['revisions'][0]['*']
     }
@@ -110,6 +111,7 @@ SCIENTIFIC_CLASSIFICATIONS_PATTERN = re.compile(
 # Find common names (bolded strings)
 COMMON_NAME_PATTERN = re.compile(r"[^']'''([^']+)'''[^']")
 def parse_plant_info(page):
+    logger.info("Parse plant: %s", page['name'])
     content = page['content']
 
     plant = {
@@ -146,6 +148,7 @@ def get_plants(category, base_url):
         base_url = WIKIPEDIA_URL
 
     page_names = get_page_names(base_url, category)
+    logging.info("Got %s page names", len(page_names))
     with futures.ThreadPoolExecutor(50) as executor:
         pages = executor.map(
             partial(get_page, base_url),
