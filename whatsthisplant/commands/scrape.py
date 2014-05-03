@@ -18,6 +18,7 @@ from __future__ import print_function
 import sys
 import logging
 import pkgutil
+import json
 
 import docopt
 
@@ -36,7 +37,7 @@ def run_scraper(scraper, seeds, base_url):
     try:
         module_name = "{}.{}".format(scrape.__name__, scraper)
         module = __import__(module_name, fromlist=[scrape.__name__])
-        module.get_plants(seeds, base_url)
+        print(json.dumps(module.get_plants(seeds, base_url), indent=2))
     except ImportError:
         print("Unrecognised source '{}'".format(scraper), file=sys.stderr)
         sys.exit(1)
