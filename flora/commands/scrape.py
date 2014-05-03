@@ -33,7 +33,10 @@ for handler in logging.root.handlers:
 
 
 def get_scrapers():
-    return [m for _, m, _ in pkgutil.iter_modules(scrape.__path__)]
+    return [
+        m for _, m, _ in pkgutil.iter_modules(scrape.__path__)
+        if not m.startswith('test')
+    ]
 
 
 def run_scraper(scraper, seeds, base_url):
@@ -47,7 +50,7 @@ def run_scraper(scraper, seeds, base_url):
 
 
 def get_args():
-    docstring = __doc__.replace('{{sources}}', "\t\n".join(get_scrapers()))
+    docstring = __doc__.replace('{{sources}}', "\n    ".join(get_scrapers()))
     return docopt.docopt(docstring, version="0.0.1")
 
 
