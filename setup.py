@@ -12,10 +12,12 @@ setup(
         'requests>=1.2',
         'futures>=2.1',
         'docopt>=0.6',
+        'praw>=2.1',
     ],
     entry_points={
         "console_scripts": [
             "wtp-scrape = whatsthisplant.commands.scrape:main",
+            "wtp-reddit = whatsthisplant.commands.reddit:main",
         ],
     },
     tests_require=['nose'],
