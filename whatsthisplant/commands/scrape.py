@@ -16,6 +16,7 @@ Options:
 """
 from __future__ import print_function
 import sys
+import os
 import logging
 import pkgutil
 import json
@@ -24,7 +25,9 @@ import docopt
 
 from .. import scrape
 
-logging.basicConfig(level=logging.DEBUG)
+
+logging.basicConfig(
+    level=getattr(logging, os.environ.get('LOGLEVEL', 'WARNING')))
 for handler in logging.root.handlers:
     handler.addFilter(logging.Filter("whatsthisplant"))
 
