@@ -129,11 +129,11 @@ def parse_plant_info(page):
 
     plant.update((key, value.lower()) for key, value in classifications)
 
-    if '|' in plant['genus']:
-        plant['common_genus'], plant['genus'] = plant['genus'].split('|')
-
     if plant['binomial'] is None:
         return None
+
+    if '|' in plant['genus']:
+        plant['common_genus'], plant['genus'] = plant['genus'].split('|')
 
     plant['common_names'] = [
             n.lower() for n in COMMON_NAME_PATTERN.findall(content)]
